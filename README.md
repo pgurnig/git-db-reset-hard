@@ -159,5 +159,5 @@ These changes allow you to see how Git keeps track of your project's history and
 
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under a custom non-commerical license. See the [LICENSE](LICENSE) file for details.
 
