@@ -1,8 +1,67 @@
-# git-lab-reset-hard
+# .git Database: Hard Reset ~1
 
-This repository demonstrates how the `.git` database changes over time as you make commits, modify files, and then use `git reset --hard` to revert changes. It provides a step-by-step illustration to help users understand the effects of `git reset --hard` on the Git history, working directory, and index given an "initial commit".
+This repository demonstrates how the `.git` database changes over time follwing the pattern of:
+- Commit #1
+- Commit #2
+- `git reset --hard HEAD~1`
 
-## Table of Contents
+This repository demonstrates how the .git database changes over time as you make commits, modify files, and then use git reset --hard to revert changes. It provides a step-by-step illustration to help users understand the effects of git reset --hard on the Git history, working directory, and index given an "initial commit".
+
+## Level Set
+Knowledgable students of git are familiar with the following:
+- .git directory as the git database
+- Working Tree or Working Directory (this paper favors *Working Tree*)
+- Staging Area or Index (this paper favors *Staging Area*)
+
+## Conclusion
+While `git reset --hard HEAD~1` is thought of as wiping history and a somewhat destructive action. While that's true for the working tree, it's not also true for the .git database. As we'll see by examing the contents of the .git directory over time, while HEAD and the .git/logs/refs/heads/main files point back to the previous commit, `.git/objects` still retains references to the objects introduced in Commit #2. The log history contains a trail of hashes from 000000 to the Commit #1 hash, the Commit #2 hash, then back to the Commit #1 hash.
+
+## In a Nutshell
+The repo began with a version of this README.md file, then followed these steps:
+```
+1. git init
+2. git add README.md
+3. git commit -m "Initial commit"
+# add example.txt to the working tree
+4. git add example.txt
+5. git commit -m "Add example.txt"
+6. git reset --hard HEAD~1
+```
+The goal is to compare `git commit -m "Initial commit"` with `git commit -m "Add example.txt"` to show the differences; then to show the result of `git reset --hard HEAD~1` back to the *initial commit*.
+
+However, we'll do more than compare the commit hashes, but will exam the .git database in some detail to compare the state of .git between steps 3 and 5, then against 6 and 3.
+
+### Comparing Steps 3 and 5
+![.git Comparison between Steps 3 and 5 - the first and second commits](images/compare-steps-03-and-05.png)
+
+The image shows newly added files in green, updated files in blue. Let's review.
+- example.txt: a new file added to the working tree
+- logs: shows the trail of commits on `main`; with `git reset --hard HEAD~1` we'll be back to only line 1 as shown below
+
+#### Logs Diff
+![.git logs diff](images/compare-steps-03-and-05-logs-diff.png)
+
+### Comparing Steps 5 and 6
+![.git Comparison between Steps 5 and 6 - the second commit and the hard reset](images/compare-steps-05-and-06.png)
+
+#### Logs Diff
+![compare-steps-05-and-06-logs-diff](images/compare-steps-05-and-06-logs-diff.png)
+
+What's fascinating with this is that we didn't lose all history. There's still a reference to the `3a23da` commit in the log history.
+
+### Comparing Steps 6 and 3
+
+<!--
+20241006111402: the result of `git init`
+20241006111450: the result of `git add README.md`
+20241006111541: the result of `git commit -m "Initial commit"
+20241006111701: the result of adding example.txt to the working tree
+20241006111740: the result of `git add example.txt`
+20241006111825: the result of `git commit -m "Add example.txt"`
+20241006112146: the result of 'git reset --hard HEAD~1`
+-->
+## The Detail
+### Table of Contents
 - [Overview](#overview)
 - [Getting Started](#getting-started)
 - [Workflow](#workflow)
@@ -11,7 +70,7 @@ This repository demonstrates how the `.git` database changes over time as you ma
 - [Contributing](#contributing)
 - [License](#license)
 
-## Overview
+### Overview
 Git is a powerful version control system that tracks changes to files. Sometimes, you may want to revert your working directory to match a previous commit. This can be done using `git reset --hard`, which can alter the Git history and working directory, along with the contents of the `.git` directory.
 
 This repository walks you through an example of how the `.git` directory evolves as changes are made, committed, and then reverted with `git reset --hard`.
@@ -22,7 +81,7 @@ One particularly useful comparison for git and especially for being able to expe
 >
 > — John D. Blischak, Emily R. Davenport, Greg Wilson, *A Quick Introduction to Version Control with Git and GitHub*
 
-## `git reset` Types
+### `git reset` Types
 There are three types of resets:
 1. **hard**: the type of reset we're exploring here
 2. **mixed**: the default type executed when you simply type `git reset`
@@ -39,14 +98,14 @@ For `git reset --hard`, each of these areas is impacted.
 |:-------------:|:---------------:|:------------:|
 |      ✓        |        ✓        |      ✓       |
 
-## The `reset` areas
+### The `reset` areas
 A complete explanation of Working Tree, Index (Staging) and HEAD is beyond the scope of this document, but we'll discuss each briefly.
 
 - Working Tree: your local filesystem that may contain committed or uncommitted files
 - Index or Staging Area: the area where you stage the files you intend to commit. i.e., the result of `git add <filename>`
 - HEAD: a reference to the current commit
 
-## Workflow
+### Workflow
 The following workflow shows how changes in the `.git` database occur through various operations. You'll be able to track how the Git object database evolves, and how history changes with each step:
 
 1. **init, add and commit**: We create our initial .git state.
@@ -82,7 +141,7 @@ The following workflow shows how changes in the `.git` database occur through va
    ls .git/objects
    ```
 -->
-## Understanding the .git Directory
+### Understanding the .git Directory
 The `.git` directory is the hidden folder where Git stores all the information about your repository. Some important components:
 - **Objects**: Stores the actual file contents, commit objects, trees, and blobs.
 - **Refs**: Contains references to commits, such as branches and tags.
@@ -90,7 +149,7 @@ The `.git` directory is the hidden folder where Git stores all the information a
 
 By exploring the `.git` directory after each operation, you will gain a better understanding of how Git manages your project's history.
 
-## Observing Changes
+### Observing Changes
 During the steps above, you can observe the following key changes:
 - New **objects** are created each time you make a commit.
 - The **HEAD** reference is updated to point to the new commit.
@@ -98,8 +157,6 @@ During the steps above, you can observe the following key changes:
 
 These changes allow you to see how Git keeps track of your project's history and how `git reset --hard` alters that history.
 
-## Contributing
-We welcome contributions to this repository! Feel free to open issues or submit pull requests if you have suggestions or improvements.
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
