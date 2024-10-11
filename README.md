@@ -1,20 +1,34 @@
 # .git Database: Hard Reset ~1
+This repository demonstrates how the .git database changes over time as you make commits, modify files, and then use `git reset --hard` to revert changes. It provides a step-by-step illustration to help users understand the effects of `git reset --hard` on Git history, the Working Tree, Staging Area and Local Repo given an "initial commit", changes, a second commit, then a reset.
 
-This repository demonstrates how the `.git` database changes over time follwing the pattern of:
+- Working Tree Modifications
+- `git add .`
 - Commit #1
+- Working Tree Modifications
+- `git add .`
 - Commit #2
 - `git reset --hard HEAD~1`
 
-This repository demonstrates how the .git database changes over time as you make commits, modify files, and then use git reset --hard to revert changes. It provides a step-by-step illustration to help users understand the effects of git reset --hard on the Git history, working directory, and index given an "initial commit".
-
 ## Level Set
-Knowledgable students of git are familiar with the following:
-- .git directory as the git database
-- Working Tree or Working Directory (this paper favors *Working Tree*)
-- Staging Area or Index (this paper favors *Staging Area*)
+It's helpful to understand the following elements:
+- Object Tracking
+   - .git directory as the git database
+- Physical and Virtual Components
+   - Working Tree or Working Directory (this paper favors *Working Tree*)
+   - Staging Area or Index (this paper favors *Staging Area*)
+   - HEAD or local repo (this paper favors the term *Local Repo*)
+   - Remote as it refers to the remote repository (i.e., GitHub, GitLab, BitBucket, CodeCommit)
+
+| Working Tree   | Staging Area (Index) | Local Repo (HEAD) | Remote Repo |
+|:--------------:|:--------------------:|:-----------------:|:-----------:|
+|       ✓        |        ✓             |         ✓         |         ✓   |
+
+The initial .git directory looks like this.
+![Initial .git directory](images/git-init.png)
+
 
 ## Conclusion
-While `git reset --hard HEAD~1` is thought of as wiping history and a somewhat destructive action. While that's true for the working tree, it's not also true for the .git database. As we'll see by examing the contents of the .git directory over time, while HEAD and the .git/logs/refs/heads/main files point back to the previous commit, `.git/objects` still retains references to the objects introduced in Commit #2. The log history contains a trail of hashes from 000000 to the Commit #1 hash, the Commit #2 hash, then back to the Commit #1 hash.
+`git reset --hard HEAD~1` is thought of as wiping history and a somewhat destructive action. While that's true for the working tree, it's not also true for the .git database. As we'll see by examing the contents of the .git directory over time, while HEAD and the .git/logs/refs/heads/main files point back to the previous commit, `.git/objects` still retains references to the objects introduced in Commit #2. The log history contains a trail of hashes from 000000 to the Commit #1 hash, the Commit #2 hash, then back to the Commit #1 hash.
 
 ## In a Nutshell
 The repo began with a version of this README.md file, then followed these steps:
