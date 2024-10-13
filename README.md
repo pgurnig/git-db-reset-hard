@@ -10,7 +10,9 @@ This repository demonstrates how the .git database changes over time as you make
 - `git reset --hard HEAD~1`
 
 ## Level Set
-It's helpful to understand the following elements:
+Git tracks changes in a hidden directory, .git. Various artifacts, such as files and directories, are stored in .git/objects. That folder is critical to tracking changes over time.
+
+It's helpful to agree on a vocabulary:
 - Object Tracking
    - .git directory as the git database
 - Physical and Virtual Components
@@ -24,14 +26,14 @@ It's helpful to understand the following elements:
 |       ✓        |        ✓             |         ✓         |         ✓   |
 
 The initial .git directory looks like this.
-![Initial .git directory](images/git-init.png)
 
+<img src="images/git-init.png" alt="git init" width="50%">
 
-## Conclusion
+## Summary
 `git reset --hard HEAD~1` is thought of as wiping history and a somewhat destructive action. While that's true for the working tree, it's not also true for the .git database. As we'll see by examing the contents of the .git directory over time, while HEAD and the .git/logs/refs/heads/main files point back to the previous commit, `.git/objects` still retains references to the objects introduced in Commit #2. The log history contains a trail of hashes from 000000 to the Commit #1 hash, the Commit #2 hash, then back to the Commit #1 hash.
 
-## In a Nutshell
-The repo began with a version of this README.md file, then followed these steps:
+## The Analysis
+The repo begins with a version of this README.md file, then follows these steps:
 ```
 1. git init
 2. git add README.md
@@ -41,9 +43,9 @@ The repo began with a version of this README.md file, then followed these steps:
 5. git commit -m "Add example.txt"
 6. git reset --hard HEAD~1
 ```
-The goal is to compare `git commit -m "Initial commit"` with `git commit -m "Add example.txt"` to show the differences; then to show the result of `git reset --hard HEAD~1` back to the *initial commit*.
+The goal is to compare `git commit -m "Initial commit"` with `git commit -m "Add example.txt"` to show the differences; then to show the result of `git reset --hard HEAD~1` back to the *initial commit* to understand the impact on the Working Tree, Staging Area and Local Repo.
 
-However, we'll do more than compare the commit hashes, but will exam the .git database in some detail to compare the state of .git between steps 3 and 5, then against 6 and 3.
+However, we'll do more than compare the commit hashes, but will examine the .git database in some detail to compare the state of .git between steps 3 and 5, then against 6 and 3.
 
 ### Comparing Steps 3 and 5
 ![.git Comparison between Steps 3 and 5 - the first and second commits](images/compare-steps-03-and-05.png)
