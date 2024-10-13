@@ -1,5 +1,5 @@
 <div style="text-align: center;">
-  <img src="images/github-portfolio-db-series.png" alt="git init" width="50%">
+  <img src="images/github-portfolio-db-series.png" alt="git init" width="33%">
 </div>
 
 # .git Database: Hard Reset ~1
