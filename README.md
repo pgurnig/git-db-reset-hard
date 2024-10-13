@@ -1,6 +1,11 @@
-# .git Database: Hard Reset ~1
-This repository demonstrates how the .git database changes over time as you make commits, modify files, and then use `git reset --hard` to revert changes. It provides a step-by-step illustration to help users understand the effects of `git reset --hard` on Git history, the Working Tree, Staging Area and Local Repo given an "initial commit", changes, a second commit, then a reset.
+<div style="text-align: center;">
+  <img src="images/github-portfolio-db-series.png" alt="git init" width="50%">
+</div>
 
+# .git Database: Hard Reset ~1
+This repository demonstrates how the .git database changes over time as you make commits, modify files, and then use `git reset --hard` to revert changes. It provides a step-by-step illustration to help users understand the effects of `git reset --hard` on the Working Tree, Staging Area and Local Repo given an "initial commit", file changes, a second commit, then a reset.
+
+## The Steps
 - Working Tree Modifications
 - `git add .`
 - Commit #1
@@ -10,12 +15,9 @@ This repository demonstrates how the .git database changes over time as you make
 - `git reset --hard HEAD~1`
 
 ## Level Set
-Git tracks changes in a hidden directory, .git. Various artifacts, such as files and directories, are stored in .git/objects. That folder is critical to tracking changes over time.
+Git tracks changes in a hidden directory, .git. The contents of files (blobs), directories (trees) are stored in .git/objects. (That directory also stores commits and tags.) That folder tracks changes over time.
 
-It's helpful to agree on a vocabulary:
-- Object Tracking
-   - .git directory as the git database
-- Physical and Virtual Components
+These changes are tracked in various states across the Git Storage Layer that consist of:
    - Working Tree or Working Directory (this paper favors *Working Tree*)
    - Staging Area or Index (this paper favors *Staging Area*)
    - HEAD or local repo (this paper favors the term *Local Repo*)
