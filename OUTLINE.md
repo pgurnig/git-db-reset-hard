@@ -145,14 +145,17 @@ If we `cat` the contents of the file, we see something like this:
 
 Let's break down the elements:
 - `0000000000000000000000000000000000000000`: This is the previous commit. All zeroes means that there was no previous commit.
-- `c579c1f279dc5f12344387f49572b64049f4a8e1`: This commit, as we saw above.
+- `c579c1f279dc5f12344387f49572b64049f4a8e1`: This commit that we saw above.
 - `J Doe <jdoe@example.com>`: The name of the committer.
 - `1729299335`: The UNIX timestamp.
 - `commit (initial): Initial commit`: The initial commit message.
 
 
 ##### Introducing `COMMIT_EDITMSG`
-lorem
+Note that this is NOT the message we committed with.
+<img src="images/git-commit-editmsg.png" alt="git commit edit msg">
+
+Based on the script we ran, we actually ran `git commit -m "Initial commit"`. This file actually represents what appears in your editor of choice (vi for example) when you commit - it can temporarily store the contents of your commit message introduced to the editor. Since we introduced our commit message using the -m flag, the contents of the editor is actually blank.
 
 ##### `index` changes
 lorem
