@@ -74,21 +74,25 @@ The intent of `git reset --hard HEAD~1` is to revert the user to the previous co
 
 ## Types of Resets
 `git reset --hard HEAD~n` impacts all three areas. In essense, it takes everything to the commit specified by *n*. As we'll see, the *Object Database* may still retain references committed after *n*, but HEAD will move *n* commits back. Think of this as starting over cleanly from the last commit.
-| Reverts Working|   Reverts Staging    |    Moves HEAD     |
-|:--------------:|:--------------------:|:-----------------:|
-|       Y        |        Y             |         Y         |
+
+| Moves HEAD | Reverts Staging | Reverts Working |
+|:----------:|:---------------:|:---------------:|
+|     Y      |       Y         |       Y         |
 
 `git reset --mixed HEAD~n` impacts two areas, clearing your *Staging Area* and moving HEAD while leaving your *Working Tree* intact. In the case of `mixed`, your local changes remain while your *Staging Area* and HEAD revert to the *n* state allowing you to redo the *index* and commit.
-| Reverts Working|   Reverts Staging    |    Moves HEAD     |
-|:--------------:|:--------------------:|:-----------------:|
-|       N        |        Y             |         Y         |
+
+| Moves HEAD | Reverts Staging | Reverts Working |
+|:----------:|:---------------:|:---------------:|
+|     Y      |       Y         |       N         |
 
 `git reset --soft HEAD~n` impacts only HEAD leaving your *Working Tree* and *Staging Area* intact. You might use this to further refine the *Staging Area* and *Working Tree* for a particular commit.
-| Reverts Working|   Reverts Staging    |    Moves HEAD     |
-|:--------------:|:--------------------:|:-----------------:|
-|                |        ✓             |         ✓         |
+
+| Moves HEAD | Reverts Staging | Reverts Working |
+|:----------:|:---------------:|:---------------:|
+|     Y      |       N         |       N         |
+
 ## Detail
-Each section will contain a brief analysis of the changes to both `.git` and the *Working Tree*.
+Each section will contain a brief analysis of the changes to the *Working Tree*, *Staging Area* and *Object Database* for each step.
 
 ### Our Steps
 ```
@@ -149,11 +153,11 @@ Friday 2024-10-18 17:55:32
 #### Understanding `git init`
 As we saw earlier, the initial `.git` directory looks like this.
 
-<img src="images/git-init.png" alt="git init" width="50%">
+<img src="images/git-init.png" alt="git init" width="60%">
 
 Rather than discuss what each of these elements are, we'll discuss them in the context of changes over time only as items are updated or added.
 
-#### Change #1 to the Working Tree `echo "README" > "README.md"`
+#### Understanding `echo "README" > "README.md"`
 Creating a new `README.md` file has no impact on `.git`. This is simply a change to the *Working Tree*. At this juncture, the object database is unaffected. However, git does know about the change as evidenced by `git status`. It marks `README.md` as an *Untracked file* and gives us a hint for what to do next. Namely, `git add <file>`.
 
 <img src="images/git-status.png" alt="git status" width="50%">
@@ -265,7 +269,7 @@ The file, COMMIT_EDITMSG, represents file storage for your commit message. It's 
 
 In the first case, no editor is invoked, but the `-m` represents the switch for "My commit message" which is saved to COMMIT_EDITMSG. If you were to subsequently `git commit --amend`, COMMIT_EDITMSG would contain the text "My commit message" and use it as part of default text.
 
-#### Change #2 to the Working Tree `echo "Lorem ipsum" > "example.txt"`
+#### Understanding `echo "Lorem ipsum" > "example.txt"`
 The addition of `example.txt` isn't unlike the addition of `README.md` earlier in that they both simply become files in the *Working Tree*.
 
 <img src="images/dark-05-git-echo-example.png" alt="echo example">
