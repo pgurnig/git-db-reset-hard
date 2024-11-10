@@ -5,22 +5,37 @@
 *This is part of a series.*
 
 # .git Database: Hard Reset ~1
-This repository demonstrates how the .git database changes over time as one follows a standard progression of initializing git, adding a file, committing that file, adding another file, committing that second file, then using `git reset --hard` to revert changes. It provides a step-by-step illustration to help users understand the effects of `git reset --hard` on the Working Tree, Staging Area and Object Database given an "initial commit", file changes, a second commit, then a reset.
+This article demonstrates how the .git database changes following this progression:
+```
+git init
+echo "README" > "README.md"
+git add README.md
+git commit -m "Initial commit"
+echo "Lorem ipsum" > "example.txt"
+git add example.txt
+git commit -m "Add example.txt"
+git reset --hard HEAD~1
+```
 
-For simplicity, we're assuming a single branch, `main`.
+This workflow is straightforward.
+
+We'll provide both a high-level summary as well as a step-by-step walkthrough to help the reader understand the effects of `git reset --hard` on the *Working Tree*, *Staging Area* and *Object Database* given the progression above.
+
+For simplicity, we're assuming a single branch.
 
 ## Level Set
 <small>
 
-> If you're already acquainted with the Working Tree, Staging Area and Object Database, feel tree to skip to the **Summary** or **Detail** section.
+> If you're already familiar with the *Working Tree*, *Staging Area* and *Object Database*, feel tree to skip to the **Summary** or **Detail** section.
 </small>
  
-Git tracks changes in a hidden directory, `.git` - we'll refer to this as the *Object Database*. The contents of files (blobs), directories (trees) and commits are stored in .git/objects. (That directory also stores annotated tags.) `.git/objects` (and other files/directories in `.git`) tracks changes over time.
+Git tracks changes in a hidden directory, `.git` - this is the *Object Database*. This data store contains a wealth of useful information.
+
+The contents of files (blobs), directories (trees) and commits are stored in the folder `.git/objects`. That directory also stores annotated tags, not in scope for this article. Understanding changes to the *Object Database* helps us understand the inner workings of Git more fully.
 
  We typically consider a workflow involving three (or four) areas:
-   - The Working Tree or Working Directory (this paper favors *Working Tree*). These are the files on your computer that you edit with something such as VS Code or Vim.
-   - The Staging Area or Index (this paper favors *Staging Area*). The result of `git add <filename>`. This area organizes files for a *commit*.
-   TODO: Do I favor *Staging Area*?
+   - The *Working Tree* or *Working Directory* (this paper favors *Working Tree*). These are the files on your computer that you edit with something such as VS Code or Vim.
+   - The *Staging Area* or *Index* (this paper favors *Staging Area*). The result of `git add <filename>`. This area organizes files for a *commit*.
    - The Object Database, Object Store, HEAD or local repo (this paper favors the term *Object Database*). The result of `git commit ...`.
    - We can consider a fourth area often used to collaborate with others. This is the Remote as it refers to the remote repository (i.e., GitHub, GitLab, BitBucket, CodeCommit)
 
@@ -28,19 +43,19 @@ Git tracks changes in a hidden directory, `.git` - we'll refer to this as the *O
 |:--------------:|:--------------------:|:-----------------:|:-----------:|
 |       ✓        |        ✓             |         ✓         |         ✓   |
 
-We'll consider changes to the Object Database as our discussion topic.
+We'll consider changes to the *Object Database* as our discussion topic.
 
-### Initialization of the Object Database
+### Initialization of the *Object Database*
 The initial .git directory looks like this:
 <img src="images/git-init.png" alt="git init" width="70%">
 
-During our review, the *directories* that will change in the `.git` folder (or are added) are:
+During our review, the directories that will change in the `.git` folder (or are added) are:
 ```
 - logs
 - objects
 - refs
 ```
-The *files* that will change in the `.git` folder (or are added) are:
+The files that will change in the `.git` folder (or are added) are:
 ```
 - COMMIT_EDITMSG
 - config
@@ -55,10 +70,25 @@ Given that, our analysis won't be concerned with:
 - HEAD (file)
 ```
 ## Summary
-The intent of `git reset --hard HEAD~1` is to revert the user to the previous commit. As we'll see, the changes to the *Working Directory* do absolutely revert while the *Object Database* keeps track of all history including the history prior to the `reset`. What happens to the *Object Database* is interesting and insightful to not only how `reset` works, but some of the thought process behind Git itself.
+The intent of `git reset --hard HEAD~1` is to revert the user to the previous commit. As we'll see, the changes to the *Working Tree* do absolutely revert while the *Object Database* keeps track of all history including the history prior to the `reset`. What happens to the *Object Database* is interesting and insightful to not only how `reset` works, but some of the thought process behind Git itself.
 
+## Types of Resets
+`git reset --hard HEAD~n` impacts all three areas. In essense, it takes everything to the commit specified by *n*. As we'll see, the *Object Database* may still retain references committed after *n*, but HEAD will move *n* commits back. Think of this as starting over cleanly from the last commit.
+| Reverts Working|   Reverts Staging    |    Moves HEAD     |
+|:--------------:|:--------------------:|:-----------------:|
+|       Y        |        Y             |         Y         |
+
+`git reset --mixed HEAD~n` impacts two areas, clearing your *Staging Area* and moving HEAD while leaving your *Working Tree* intact. In the case of `mixed`, your local changes remain while your *Staging Area* and HEAD revert to the *n* state allowing you to redo the *index* and commit.
+| Reverts Working|   Reverts Staging    |    Moves HEAD     |
+|:--------------:|:--------------------:|:-----------------:|
+|       N        |        Y             |         Y         |
+
+`git reset --soft HEAD~n` impacts only HEAD leaving your *Working Tree* and *Staging Area* intact. You might use this to further refine the *Staging Area* and *Working Tree* for a particular commit.
+| Reverts Working|   Reverts Staging    |    Moves HEAD     |
+|:--------------:|:--------------------:|:-----------------:|
+|                |        ✓             |         ✓         |
 ## Detail
-Each section will contain a brief analysis of the changes to both `.git` and the working tree.
+Each section will contain a brief analysis of the changes to both `.git` and the *Working Tree*.
 
 ### Our Steps
 ```
@@ -235,7 +265,7 @@ The file, COMMIT_EDITMSG, represents file storage for your commit message. It's 
 
 In the first case, no editor is invoked, but the `-m` represents the switch for "My commit message" which is saved to COMMIT_EDITMSG. If you were to subsequently `git commit --amend`, COMMIT_EDITMSG would contain the text "My commit message" and use it as part of default text.
 
-#### Change #2 to the working tree `echo "Lorem ipsum" > "example.txt"`
+#### Change #2 to the Working Tree `echo "Lorem ipsum" > "example.txt"`
 The addition of `example.txt` isn't unlike the addition of `README.md` earlier in that they both simply become files in the *Working Tree*.
 
 <img src="images/dark-05-git-echo-example.png" alt="echo example">
