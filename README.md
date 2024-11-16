@@ -9,6 +9,7 @@ This article demonstrates how the .git database changes over time as one follows
 [Our Steps](#our-steps)<br/>
 [Step-by-Step](#step-by-step)<br/>
 [Summary](#summary)<br/>
+[The Analysis](#the-analysis)<br/>
 [Types of Resets](#types-of-resets)<br/>
 [License](#license)
 
