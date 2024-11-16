@@ -1,0 +1,66 @@
+## Understanding `git reset --hard HEAD~1`
+
+To grasp the impact of git reset --hard HEAD~1, we must first examine the states of the Working Tree, Staging Area, and Object Database at key points: after git commit -m "Initial commit" and git commit -m "Add example.txt". Following the reset, we’ll compare the initial commit with the reset state and evaluate how .git reflects these changes.
+
+We won’t just compare commit hashes but will examine the .git database, focusing on changes to the *Object Database*, index, and .git structure between specific steps.
+
+
+We can review this on a number of levels.
+
+- Changes in the *Object Database* from our previous `commit` step to the current `reset` step.
+- Changes to the `index`.
+- A comparison of the contents of `.git` from our "Initial commit" versus what transpired based on `git reset --hard HEAD~1'. We might conclude that `.git` should be identical between the two, but it's not.
+
+First let's look at the change from our previous step, `git commit -m "Add example.txt"`.
+
+<img src="images/dark-08-git-reset-hard.png" alt="reset hard HEAD~1">
+
+What's interesting here is that the contents of `.git/objects` hasn't changed! Let's review the object types:
+```bash
+Object hash: 2ef4d42b1de7e382575a8d614517c12acab3cab6 - Type: commit
+Object hash: 3be11c69355948412925fa5e073d76d58ff3afd2 - Type: blob
+Object hash: 9bd9e28a95ee603c5e584689c84d6b9c4acee7cd - Type: tree
+Object hash: a0f25153294a9472a721f576ae7fe6584ee2ad7c - Type: commit
+Object hash: ae67265a86b2408ee3f263de0f9c6581ac7e295c - Type: tree
+Object hash: e845566c06f9bf557d35e8292c37cf05d97a9769 - Type: blob
+```
+
+We've kept both commits and both trees as well as both blob objects. If we list out the objects in each snapshot, we see exactly what we would expect:
+<img src="images/ls-current-state-reset-v-past-state-commit-2.png" alt="current state v past state" width="60%">
+
+Our `reset` version shows only README.md. What we might not expect is that the *Object Database* still contains `example.txt` and the `commit` and `tree` associated with that file.
+
+As we remarked earlier in the `git add example.txt` section, executing `git reset --hard HEAD~1` reverts the `index` to the prior commit, `git commit -m "Initial commit". We see too, in the directory comparison, that the index file is different.
+
+<img src="images/git-ls-files-stage-git-reset-hard.png" alt="git ls-files --stage" width="60%">
+
+<img src="images/dark-10-compare-initial-commit-to-reset-hard.png" alt="compare reset hard to original commit">
+
+There are differences here that we might not expect, but that we can explain.
+
+As we determined earlier, the objects `a0` and `ae` represent the commit and tree from our second `example.txt` commit. Let's take a look at 3b, although we can probably guess what it is at this point.
+
+``` bash
+git cat-file -p 3be11c69355948412925fa5e073d76d58ff3afd2
+Lorem ipsum
+```
+This is the `example.txt` file still active in our *Object Database*.
+
+Let's see what's going on with `logs/refs/heads/main`.
+
+<img src="images/git-initial-commit-v-git-reset-main-graph.png" alt="initial commit to reset main graph">
+
+Here we see that path from:
+- no commit `000000` to our initial commit `2ef4d4`
+- the initial commit `2ef4d4` to our second commit `a0f251`
+- from the second commit `a0f251` back to `2ef4d4`
+
+That makes sense. `reset` has pointed us back to the initial commit, but kept the history alive.
+
+`.git/logs/HEAD` shows us the same path.
+
+COMMIT_EDITMSG did not revert. This is because that is not a tracked file, therefore `reset` has no impact on that file.
+
+<img src="images/git-reset-v-initial-commit-commit-msg.png" alt="commit_edit">
+
+What is also interesting is the inclusion of the file `ORIG_HEAD`. The contents of this file is simply: `a0f25153294a9472a721f576ae7fe6584ee2ad7c` or the `commit` associated to our second commit. The purpose of this file is to provide an easy way to reference the state of HEAD before `reset'.
