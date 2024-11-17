@@ -34,23 +34,24 @@ This article demonstrates how the .git database changes over time as one follows
 > To see the change detail from `git init` through Commit #2, refer to [this](level-set.md).
 
 ## Summary
-The intent of `git reset --hard HEAD~1` is to revert the user to the previous commit - this includes the *Working Tree*, *Staging Area* and *HEAD*. As we'll see, while changes to the *Working Tree* do absolutely revert, the *Object Database* still keeps track of history including history after the first (initial) commit. What happens to the *Object Database* is interesting and insightful to not only understanding how `reset` works, but also in terms of the thought process behind Git itself.
+The intent of `git reset --hard HEAD~1` is to set the user to the previous commit - this includes the *Working Tree*, *Staging Area* and *Object Database* (*HEAD*). As we'll see, while changes to the *Working Tree* do absolutely revert, the *Object Database* still keeps track of history including history after the first (initial) commit. What happens to the *Object Database* is interesting and insightful to not only understanding how `reset` works, but also in terms of the thought process behind Git itself.
 
-This behavior preserves the history of objects, ensuring that the underlying Git design supports the recovery of previous states even after a reset.gm
+This behavior preserves the history of objects, ensuring that the underlying Git design supports the recovery of previous states even after a reset.
 
 ## The Analysis
 ### Understanding `git reset --hard HEAD~1`
 
-To understand the impact of git reset --hard HEAD~1, we must first examine the states of the *Working Tree*, *Staging Area*, and *Object Database* at key points: after `git commit -m "Initial commit"` and `git commit -m "Add example.txt"`. Following the reset, we’ll compare the initial commit with the reset state and evaluate how .git reflects these changes.
+To understand the impact of `git reset --hard HEAD~1`, we first examine the states of the *Working Tree*, *Staging Area*, and *Object Database* at key points: specifically, after `git commit -m "Initial commit"`, `git commit -m "Add example.txt"` and then `git reset --hard HEAD~1``.
 
-We won’t just compare commit hashes but will delve into the .git database, focusing on changes to the *Object Database*, `index`, and .git structure between specific steps.
+We won’t just compare commit hashes but we'll delve into the .git database, focusing on changes to the *Object Database*, `index`, and *Working Tree* between specific steps.
 
 ### Observed Changes
 
 #### The Object Database
-After executing `git reset --hard HEAD~1`, the contents of `.git/objects` remain unchanged, retaining all commits, trees, and blob objects, even from reverted commits:
+After executing `git reset --hard HEAD~1`, the contents of `.git/objects` remain unchanged from `git commit -m "Add example.txt"`, retaining all commits, trees, and blob objects, even from reverted commits:
 <img src="images/dark-08-git-reset-hard.png" alt="reset hard HEAD~1">
 
+Just from a listing of the objects, one can take note of two commits and two blobs. The first commit obviously simply contained one commit and one file, README.md.
 ```bash
 Object hash: 2ef4d42b1de7e382575a8d614517c12acab3cab6 - Type: commit
 Object hash: 3be11c69355948412925fa5e073d76d58ff3afd2 - Type: blob
@@ -60,9 +61,11 @@ Object hash: ae67265a86b2408ee3f263de0f9c6581ac7e295c - Type: tree
 Object hash: e845566c06f9bf557d35e8292c37cf05d97a9769 - Type: blob
 ```
 
-This may be somewhat surprising given warnings often associated with the "hard" flavor of `git reset`. The database preserves `example.txt` and its associated commit and tree objects, even though the *Working Tree* and `index` reflect only `README.md`. This illustrates that `git reset` modifies the *Working Tree* and `index`, but leaves portions of the *Object Database* intact.
+This may be somewhat surprising given warnings often associated with the "hard" flavor of `git reset`. The database preserves `example.txt` and its associated commit and tree objects, even though the *Working Tree* and `index` reflect only `README.md`. This illustrates that `git reset` modifies the *Working Tree* and `index`, but leaves much of the *Object Database* intact.
 
 #### Index Comparison
+Now that we've inspected both the *Working Directory* and the *Object Database*, let's consider the *Staging Area* or `index`.
+
 Comparing the `index` file after the reset reveals it has reverted to the state of `git commit -m "Initial commit"`. The following differences highlight this:
 
 `git ls-files --stage` after the second staging.<br/>
