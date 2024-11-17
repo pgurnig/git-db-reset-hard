@@ -10,6 +10,14 @@ This article demonstrates how the .git database changes over time as one follows
 [Step-by-Step](#step-by-step)<br/>
 [Summary](#summary)<br/>
 [The Analysis](#the-analysis)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*[Understanding git reset --hard HEAD~1](#understanding-git-reset---hard-head1)*<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*[Observed Changes](#observed-changes)*<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[The Object Database](#the-object-database)*<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[Index Comparison](#index-comparison)*<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[Commit History](#commit-history-logsrefsheadsmain)*<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[Additional Observations](#additional-observations)*<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[lipsum](#)*<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*[Undoing the Reset](#undoing-the-reset)*<br/>
 [Types of Resets](#types-of-resets)<br/>
 [License](#license)
 
@@ -64,10 +72,11 @@ Comparing the `index` file after the reset reveals it has reverted to the state 
 <img src="images/git-ls-files-stage-git-reset-hard.png" alt="git ls-files --stage" width="60%">
 
 #### The Working Tree
+Running `ls` on the *Working Tree* illustrates the changes to the file system itself:<br/>
 <img src="images/ls-current-state-reset-v-past-state-commit-2.png" alt="current state v past state" width="60%">
 
 #### Commit History `logs/refs/heads/main`:
-The `logs/refs/heads/main` file shows the progression:
+We saw in the screenshot above that `logs/refs/heads/main` changed. Viewing the file shows the progression of the commits as:
 - No commit (000000) → Initial commit (2ef4d4)
 - Initial commit (2ef4d4) → Second commit (a0f251)
 - Second commit (a0f251) → Reset back to Initial commit (2ef4d4)
