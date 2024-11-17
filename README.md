@@ -14,9 +14,9 @@ This article demonstrates how the .git database changes over time as one follows
 &nbsp;&nbsp;&nbsp;&nbsp;*[Observed Changes](#observed-changes)*<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[The Object Database](#the-object-database)*<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[Index Comparison](#index-comparison)*<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[The Working Tree](#the-working-tree)*<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[Commit History](#commit-history-logsrefsheadsmain)*<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[Additional Observations](#additional-observations)*<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[lipsum](#)*<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;*[Undoing the Reset](#undoing-the-reset)*<br/>
 [Types of Resets](#types-of-resets)<br/>
 [License](#license)
