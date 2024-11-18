@@ -15,7 +15,6 @@ This article demonstrates how the .git database changes over time as one follows
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[The Object Database](#the-object-database)*<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[Index Comparison](#index-comparison)*<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[The Working Tree](#the-working-tree)*<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[Commit History](#commit-history-logsrefsheadsmain)*<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*[Additional Observations](#additional-observations)*<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;*[Undoing the Reset](#undoing-the-reset)*<br/>
 [Types of Resets](#types-of-resets)<br/>
@@ -64,38 +63,55 @@ Object hash: e845566c06f9bf557d35e8292c37cf05d97a9769 - Type: blob
 This may be somewhat surprising given warnings often associated with the "hard" flavor of `git reset`. The database preserves `example.txt` and its associated commit and tree objects, even though the *Working Tree* and `index` reflect only `README.md`. This illustrates that `git reset` modifies the *Working Tree* and `index`, but leaves much of the *Object Database* intact.
 
 #### Index Comparison
-Now that we've inspected both the *Working Directory* and the *Object Database*, let's consider the *Staging Area* or `index`.
+Now that we've inspected both the *Object Database*, let's consider the *Staging Area* or `index`.
 
-Comparing the `index` file after the reset reveals it has reverted to the state of `git commit -m "Initial commit"`. The following differences highlight this:
+Comparing the `index` file after the reset reveals it has reverted to the state of `git commit -m "Initial commit"`. We can use `git ls-files --stage` to inspect the contents of the `index` - this will detail a number of properties for us including permissions, that hash and the path. The following differences highlight this:
 
 `git ls-files --stage` after the second staging.<br/>
-<img src="images/git-ls-files-stage-add-example.png" alt="git ls-files --stage" width="60%"><br/>
+<img src="images/git-ls-files-stage-add-example.png" alt="git ls-files --stage" width="80%"><br/>
 
 `git ls-files --stage` after the reset.<br/>
-<img src="images/git-ls-files-stage-git-reset-hard.png" alt="git ls-files --stage" width="60%">
+<img src="images/git-ls-files-stage-git-reset-hard.png" alt="git ls-files --stage" width="80%">
 
 #### The Working Tree
-Running `ls` on the *Working Tree* illustrates the changes to the file system itself:<br/>
-<img src="images/ls-current-state-reset-v-past-state-commit-2.png" alt="current state v past state" width="60%">
+With the *Object Database* and *Staging Area* accounted for, let's review the *Working Tree*.
 
-#### Commit History `logs/refs/heads/main`:
-We saw in the screenshot above that `logs/refs/heads/main` changed. Viewing the file shows the progression of the commits as:
+Running `ls` on the *Working Tree* illustrates the changes to the file system itself:<br/>
+<img src="images/ls-current-state-reset-v-past-state-commit-2.png" alt="current state v past state" width="80%">
+
+This accounts for the three areas we've been focusing on: the *Working Tree*, *Staging Area* (`index`), and the *Object Database*.
+
+Let's look at some additional items the *Object Database*.
+
+#### Additional Observations
+We saw in the *Object Database* comparison above that a number of other items changed:
+- `logs/refs/heads/main`
+- `logs/HEAD`
+- `refs/heads/main`
+- `index`
+- `ORIG_HEAD`
+
+We've discussed `index`. Let's look at the others.
+
+##### Commit History `logs/refs/heads/main`
+Viewing the file, `logs/refs/heads/main`, shows the progression of the commits as:
 - No commit (000000) → Initial commit (2ef4d4)
 - Initial commit (2ef4d4) → Second commit (a0f251)
 - Second commit (a0f251) → Reset back to Initial commit (2ef4d4)
 
-This confirms the reset moved `HEAD` back to the initial commit while preserving prior history.
+This confirms the reset moved `HEAD` back to the initial commit while preserving our second commit.
 
 <img src="images/git-initial-commit-v-git-reset-main-graph.png" alt="initial commit to reset main graph">
 
-#### Additional Observations
-##### Untracked Files:
+We have a few more items.
+
+##### Untracked Files
 > The file `COMMIT_EDITMSG` remains unchanged because it is not tracked by Git and thus unaffected by the reset.
 
-##### ORIG_HEAD:
-> The file `ORIG_HEAD` stores the commit hash (`a0f251`) of the pre-reset state, allowing easy reference to the previous `HEAD` position.
+##### ORIG_HEAD
+> The file `ORIG_HEAD` stores the commit hash (`a0f251`) of the pre-reset state, allowing easy reference to the previous `HEAD` position. We could use this with `git reset --hard ORIG_HEAD`.
 
-##### Blob Object:
+##### Blob Object
 > Even after resetting, the blob for example.txt (`3be11c`) remains in the database. Note:
 
 `git cat-file -p 3be11c69355948412925fa5e073d76d58ff3afd2`
