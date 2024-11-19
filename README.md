@@ -5,7 +5,7 @@
 # .git Database: Hard Reset ~1
 This article explores how the .git database evolves through key Git operations: initializing a repository, adding files, committing changes, adding new untracked content, committing again, and finally using `git reset --hard` to revert to the original commit. A step-by-step guide demonstrates the effects of `git reset --hard` on the *Working Tree*, *Staging Area*, and *Object Database*.”
 <small>
-> If the terms *Working Tree*, *Staging Area*, or *Object Database* are not familiar, review this brief guide that explains these concepts.
+> If the terms *Working Tree*, *Staging Area*, or *Object Database* are not familiar, review this [brief guide](level-set.md) that explains these concepts.
 </small>
 
 **Table of Contents**<br/>
