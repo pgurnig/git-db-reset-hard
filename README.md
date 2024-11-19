@@ -3,7 +3,7 @@
 </div>
 
 # .git Database: Hard Reset ~1
-This article explores how the .git database evolves through key Git operations: initializing a repository, adding files, committing changes, adding new untracked content, committing again, and finally using `git reset --hard` to revert to the original commit. A step-by-step guide demonstrates the effects of `git reset --hard` on the *Working Tree*, *Staging Area*, and *Object Database*.”
+This article explores how the .git database evolves through key Git operations: initializing a repository, adding files, committing changes, adding new untracked content, committing again, and finally using `git reset --hard` to revert to the original commit. A step-by-step guide demonstrates the effects of `git reset --hard` on the *Working Tree*, *Staging Area*, and *Object Database*.
 <small>
 > If the terms *Working Tree*, *Staging Area*, or *Object Database* are not familiar, review this [brief guide](level-set.md) that explains these concepts.
 </small>
@@ -53,7 +53,7 @@ We won’t just compare commit hashes but we'll delve into the .git database, fo
 After executing `git reset --hard HEAD~1`, the contents of `.git/objects` remain unchanged from `git commit -m "Add example.txt"`, retaining all commits, trees, and blob objects, even from reverted commits:
 <img src="images/dark-08-git-reset-hard.png" alt="reset hard HEAD~1">
 
-Just from a listing of the objects, one can take note of two commits and two blobs. The first commit obviously simply contained one commit and one file, README.md.
+From the list of objects, we can identify two commits and two blobs. The first commit contains a single file, README.md, as expected.
 ```bash
 Object hash: 2ef4d42b1de7e382575a8d614517c12acab3cab6 - Type: commit
 Object hash: 3be11c69355948412925fa5e073d76d58ff3afd2 - Type: blob
@@ -63,53 +63,53 @@ Object hash: ae67265a86b2408ee3f263de0f9c6581ac7e295c - Type: tree
 Object hash: e845566c06f9bf557d35e8292c37cf05d97a9769 - Type: blob
 ```
 
-This may be somewhat surprising given warnings often associated with the "hard" flavor of `git reset`. The database preserves `example.txt` and its associated commit and tree objects, even though the *Working Tree* and `index` reflect only `README.md`. This illustrates that `git reset` modifies the *Working Tree* and `index`, but leaves much of the *Object Database* intact.
+This may seem surprising, given the warnings often associated with the hard flavor of `git reset`. However, the database retains `example.txt` along with its associated commit and tree objects, even though the *Working Tree* and `index` now reflect only `README.md`. This demonstrates that `git reset` updates the *Working Tree* and `index` but leaves much of the *Object Database* unchanged.
 
 #### Index Comparison
-Now that we've inspected both the *Object Database*, let's consider the *Staging Area* or `index`.
+Now that we’ve inspected the *Object Database*, let’s turn our attention to the *Staging Area* or `index`.
 
-Comparing the `index` file after the reset reveals it has reverted to the state of `git commit -m "Initial commit"`. We can use `git ls-files --stage` to inspect the contents of the `index` - this will detail a number of properties for us including permissions, that hash and the path. The following differences highlight this:
+Comparing the `index` file after the reset shows that it has been restored to the state of `git commit -m "Initial commit"`. We can use `git ls-files --stage` to examine its contents, revealing details such as permissions, the hash, and the path. The following differences illustrate this:
 
-`git ls-files --stage` after the second staging.<br/>
+git ls-files --stage output after the second staging.<br/>
 <img src="images/git-ls-files-stage-add-example.png" alt="git ls-files --stage" width="80%"><br/>
 
 `git ls-files --stage` after the reset.<br/>
 <img src="images/git-ls-files-stage-git-reset-hard.png" alt="git ls-files --stage" width="80%">
 
 #### The Working Tree
-With the *Object Database* and *Staging Area* accounted for, let's review the *Working Tree*.
+With the *Object Database* and *Staging Area* accounted for, let's examine the *Working Tree*.
 
 Running `ls` on the *Working Tree* illustrates the changes to the file system itself:<br/>
 <img src="images/ls-current-state-reset-v-past-state-commit-2.png" alt="current state v past state" width="80%">
 
-This accounts for the three areas we've been focusing on: the *Working Tree*, *Staging Area* (`index`), and the *Object Database*.
+This summarizes the three areas we've focused on: the *Working Tree*, *Staging Area* (`index`), and *Object Database*.
 
-Let's look at some additional items the *Object Database*.
+Let's examine some additional items the *Object Database*.
 
 #### Additional Observations
-We saw in the *Object Database* comparison above that a number of other items changed:
+In the *Object Database* comparison above, we observed several additional changes:
 - `logs/refs/heads/main`
 - `logs/HEAD`
 - `refs/heads/main`
 - `index`
 - `ORIG_HEAD`
 
-We've discussed `index`. Let's look at the others.
+We've already discussed `index`. Let's examine the others.
 
 ##### Commit History `logs/refs/heads/main`
-Viewing the file, `logs/refs/heads/main`, shows the progression of the commits as:
+Viewing the file, `logs/refs/heads/main`, reveals the progression of commits:
 - No commit (000000) → Initial commit (2ef4d4)
 - Initial commit (2ef4d4) → Second commit (a0f251)
 - Second commit (a0f251) → Reset back to Initial commit (2ef4d4)
 
-This confirms the reset moved `HEAD` back to the initial commit while preserving our second commit.
+This confirms that the reset moved `HEAD` back to the initial commit while preserving our second commit in the *Object Database*.
 
 <img src="images/git-initial-commit-v-git-reset-main-graph.png" alt="initial commit to reset main graph">
 
-We have a few more items.
+There are a few remaining items worth examination.
 
 ##### Untracked Files
-> The file `COMMIT_EDITMSG` remains unchanged because it is not tracked by Git and thus unaffected by the reset.
+> The file `COMMIT_EDITMSG` remains unchanged; it is not tracked by Git and thus unaffected by the reset.
 
 ##### ORIG_HEAD
 > The file `ORIG_HEAD` stores the commit hash (`a0f251`) of the pre-reset state, allowing easy reference to the previous `HEAD` position. We could use this with `git reset --hard ORIG_HEAD`.
@@ -131,21 +131,21 @@ git reset --hard ORIG_HEAD
 ```
 
 ## Types of Resets
-`git reset --hard` is one type of reset among three: `--hard`, `--mixed` and `--soft`. Each of these affects the *Working Tree*, *Staging Area* and *HEAD* in different ways, as we'll see below.
+`git reset --hard` is one of three types of reset: `--hard`, `--mixed`, and `--soft`. Each impacts the *Working Tree*, *Staging Area*, and *HEAD* differently, as explained below.
 
-`git reset --hard HEAD~n` impacts all three areas. It reverts everything back to the commit specified by *n*. What's interesting is that the *Object Database* may still retain references committed after *n*, but HEAD will move *n* commits back. Think of this as starting over cleanly from the last commit where you want to start cleanly everywhere, including your local files.
+`git reset --hard HEAD~n` affects all three areas by restoring them to the state of the commit specified by *n* with an important distinction for the *Object Database*. The *Object Database* still retains references to commits after *n*, even though HEAD moves *n* commits back. This effectively provides a clean slate from the specified commit, including changes to local files.
 
 | Moves HEAD | Reverts Staging | Reverts Working |
 |:----------:|:---------------:|:---------------:|
 |     Y      |       Y         |       Y         |
 
-`git reset --mixed HEAD~n` impacts two areas, clearing your *Staging Area* and moving HEAD while leaving your *Working Tree* intact. In the case of `mixed`, your local files remain intact while your *Staging Area* and HEAD revert to the *n* state allowing you to redo the *index* and commit.
+`git reset --mixed HEAD~n` affects two areas by clearing the Staging Area and moving HEAD, while leaving the *Working Tree* unchanged. With `--mixed`, your local files remain untouched, but the *Staging Area* and HEAD return to the *n* state, allowing you to revise the *index* and commit.
 
 | Moves HEAD | Reverts Staging | Reverts Working |
 |:----------:|:---------------:|:---------------:|
 |     Y      |       Y         |       N         |
 
-`git reset --soft HEAD~n` impacts only HEAD leaving your *Working Tree* and *Staging Area* intact. You might use this to further refine the *Staging Area* and *Working Tree* for a particular commit.
+`git reset --soft HEAD~n` affects only HEAD, leaving the *Working Tree* and *Staging Area* unchanged. This option is useful for refining the *Staging Area* and *Working Tree* before making a new commit.
 
 | Moves HEAD | Reverts Staging | Reverts Working |
 |:----------:|:---------------:|:---------------:|
