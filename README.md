@@ -33,7 +33,7 @@ This article explores how the .git database evolves through key Git operations: 
 - Reset back to Commit #1 (`git reset --hard HEAD~1`)
 
 ## Step-by-Step
-> To see the change detail from `git init` through Commit #2, refer to [this](object-database-init-to-commit-2.md).
+> To see the change detail from `git init` through Commit #2, refer to [this](two-commits.md).
 
 ## Summary
 The intent of git reset --hard HEAD~1 is to set the user back to the previous commit—this includes the *Working Tree*, *Staging Area*, and *Object Database* (HEAD). While changes to the *Working Tree* are reset to match the previous commit, the *Object Database* retains history, including objects created after the first commit. This behavior offers insights into both the mechanics of `reset` and Git’s design philosophy.

@@ -1,6 +1,8 @@
 ## Detail
 Each section will contain a brief analysis of the changes to the *Working Tree*, *Staging Area* and *Object Database* for each step.
 
+>If the terms *Working Tree*, *Staging Area*, or *Object Database* are not familiar, review this [brief guide](level-set.md) that explains these concepts.
+
 ### Our Steps
 ```
 git init
@@ -60,18 +62,19 @@ Friday 2024-10-18 17:55:32
 #### Understanding `git init`
 As we saw earlier, the initial `.git` directory looks like this.
 
-
 <img src="images/git-init.png" alt="git init" width="60%">
 
 Rather than discuss what each of these elements are, we'll discuss them in the context of changes over time only as items are updated or added.
 
-#### Understanding `echo "README" > "README.md"`
-Creating a new `README.md` file has no impact on `.git`. This is simply a change to the *Working Tree*. At this juncture, the object database is unaffected. However, git does know about the change as evidenced by `git status`. It marks `README.md` as an *Untracked file* and gives us a hint for what to do next. Namely, `git add <file>`.
+> The `hooks` directory isn't often considered in the context of these analyses, so you'll often see that directory collapsed.
 
-<img src="images/git-status.png" alt="git status" width="50%">
+#### Understanding `echo "README" > "README.md"`
+Creating a new `README.md` file has no impact on `.git`. This is simply a change to the *Working Tree*. At this juncture, the *Object Database* is unaffected. However, git does know about the change as evidenced by `git status`. It marks `README.md` as an `Untracked file` and gives us a hint for what to do next. Namely, `git add <file>`.
+
+<img src="images/git-status.png" alt="git status" width="60%">
 
 #### Understanding `git add README.md`
-This is a fairly important stage in the process, and one that some git "helper" tools gloss over by combining the steps `git add <file>` and `git commit ...`. As version control tools go, the `add` step is somewhat unique to git, and a powerful tool to organize a commit.
+This is a fairly important stage in the process, and one that some git "helper" tools gloss over by combining the steps `git add <file>` and `git commit ...`. As version control tools go, the `add` step is somewhat unique to git, and a powerful tool to organize a commit as you can carefully craft the specifics for the commit.
 
 Executing `git add README.md` impacts two items.
 - An object is added to the `objects` subdirectory, e845566c06f9bf557d35e8292c37cf05d97a9769. This blob is the SHA-1 hash of metadata and the file contents.
@@ -80,17 +83,17 @@ Executing `git add README.md` impacts two items.
 > 📝 **Note**
 > *We'll see this same object (e845566c06f9bf557d35e8292c37cf05d97a9769) in other repos in this series as the contents and metadata are the same.*
 
-<img src="images/git-add-readme.png" alt="git add readme" width="50%">
+<img src="images/git-add-readme.png" alt="git add readme">
 
 ##### The e8 object
-The object, `e845566c06f9bf557d35e8292c37cf05d97a9769`, is the result of applying SHA-1 to the README.md file. You can garner the same has value by using `git hash-object` on the file to understand how the hash is created. (There's a bit more to `git hash-object` than simply calculating the hash using `shasum` as it leverages metadata for its computation, specifically, `blob <size>\0<content>`.)
+The object, `e845566c06f9bf557d35e8292c37cf05d97a9769`, is the result of applying SHA-1 to the README.md file. You can garner the same hash value by using `git hash-object` on the file to understand how the hash is created. (There's a bit more to `git hash-object` than simply calculating the hash using `shasum` as it leverages metadata for its computation, specifically, `blob <size>\0<content>`.)
 
 <img src="images/git-hash-object-readme.png" alt="git add readme" width="50%">
 
 Note that Git uses the first two characters of the hash as the subdirectory to allow for an even distribution of folders. There are 256 possible combinations of the first two characters. (The math: each of the two characters can be a value 0-9, a-f, or a hex value. There are 16 values possible for each, so 16*16.)
 
 ##### The `index` file
-The `index` file makes an appearance! This is an indication that we're introducing changes in our *Staging Area*. These changes are not yet committed. Think of the staging area as a place to organize the files you plan to commit. You can add files one at a time to organize your commit at a granular level (rather than just invoking `git add .` from the root folder in the project).
+The `index` file makes an appearance! This is an indication that we're introducing changes to our *Staging Area*. These changes are not yet committed. Think of the staging area as a place to organize the files you plan to commit. You can add files one at a time to organize your commit at a granular level (rather than just invoking `git add .` from the root folder in the project).
 
 You can't `cat` the `.git/index` file obtaining any sensible results. However, you can run the following to understand the contents:
 
